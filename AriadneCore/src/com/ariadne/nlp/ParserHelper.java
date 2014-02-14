@@ -7,7 +7,7 @@ import java.util.Set;
 
 import com.ariadne.units.SentenceUnit;
 import com.ariadne.units.Triplet;
-import com.ariandne.util.Logger;
+import com.ariadne.util.Logger;
 
 import edu.stanford.nlp.ling.CoreAnnotations.SentencesAnnotation;
 import edu.stanford.nlp.ling.IndexedWord;

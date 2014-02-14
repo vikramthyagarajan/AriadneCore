@@ -1,6 +1,6 @@
 package com.ariadne.nlp;
 
-import com.ariandne.util.Logger;
+import com.ariadne.util.Logger;
 
 public class Test 
 {
