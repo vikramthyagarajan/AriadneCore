@@ -5,6 +5,8 @@ import java.util.Properties;
 import java.util.Scanner;
 import java.util.Set;
 
+import com.ariadne.units.ComplexUnit;
+import com.ariadne.units.Doublet;
 import com.ariadne.units.SentenceUnit;
 import com.ariadne.units.Triplet;
 import com.ariadne.util.Logger;
@@ -65,20 +67,48 @@ public class ParserHelper
 		traverseTree(s, froot);
 	}
 	/*
-	 * Used to retrieve words along with its respective adjectives, adverbs etc.
+	 * Used to retrieve words along with its respective adjectives, adverbs and preposition etc.
 	 */
-	private static String getCompleteDataOfNode(SemanticGraph semGraph,IndexedWord node)
+	private static String getCompleteDataOfNode(SemanticGraph semGraph,IndexedWord node,ComplexUnit cUnit)
+	{
+		StringBuilder result=new StringBuilder();
+		List<IndexedWord> children=semGraph.getChildList(node);
+		for(IndexedWord child:children)
+		{
+			String rel=semGraph.getEdge(node, child).getRelation().toString();
+			if(rel.equals("amod"))
+			{
+				result.append(child.word()+" ");
+			}
+			else if(rel.equals("nn"))
+			{
+				result.append(child.word()+" ");
+			}
+			else if(rel.startsWith("prep"))
+			{
+				int index=rel.lastIndexOf('_')+1;
+				if(index!=0)
+				{
+					Doublet d=new Doublet(rel.substring(index),child.word());
+					cUnit.addAdditionalData(d);
+           	 	}
+			}
+		}
+		result.append(node.word());
+		return result.toString();
+	}
+	/*
+	 * While setting Subject, only nn is important. No prepositional data or data about adjective
+	 * or adverbs are stored in Subject.
+	 */
+	private static String getSubjectDataOfNode(SemanticGraph semGraph,IndexedWord node)
 	{
 		StringBuilder result=new StringBuilder();
 		List<IndexedWord> children=semGraph.getChildList(node);
 		for(IndexedWord child:children)
 		{
 			String rel=semGraph.getEdge(node, child).getRelation().getShortName();
-			if(rel.equals("amod"))
-			{
-				result.append(child.word()+" ");
-			}
-			else if(rel.equals("nn"))
+			if(rel.equals("nn"))
 			{
 				result.append(child.word()+" ");
 			}
@@ -95,31 +125,52 @@ public class ParserHelper
 	{
 		SentenceUnit result=new SentenceUnit();
 		IndexedWord root=semGraph.getFirstRoot();
-		Triplet triplet=new Triplet();
-		triplet.setVerb(root.word());
+		//ArrayList<Triplet> triplets=new ArrayList<Triplet>();
 		List<IndexedWord>children=semGraph.getChildList(root);
+		ComplexUnit cUnit=new ComplexUnit();
+		cUnit.addVerb(root.word());
+		boolean isPassive=false;
 		for(IndexedWord child:children)
 		{
-			String rel=semGraph.getEdge(root, child).getRelation().getShortName();
-			/*logic for additional verbs. 
-			 * TODO:- Implement later.
-             */
-             //if()
+			String rel=semGraph.getEdge(root, child).getRelation().toString();
+			//Logger.log(rel);
+             if(rel.startsWith("conj_and"))
+             {
+            	 cUnit.addVerb(child.word());
+             }
 			
              //Logic for getting subject
-             if(rel.startsWith("nsubj"))
+             else if(rel.equals("nsubjpass"))
              {
-            	 triplet.setSubject(getCompleteDataOfNode(semGraph, child));
+            	 isPassive=true;
+            	 cUnit.addObject(getCompleteDataOfNode(semGraph, child,cUnit));
+             }
+             else if(rel.equals("nsubj"))
+             {
+            	 cUnit.addSubject(getSubjectDataOfNode(semGraph, child));
              }
              
              //Logic for getting object
-             if(rel.equals("agent")||rel.contains("obj"))
+             else if(rel.equals("agent")||rel.contains("obj"))
              {
-            	 triplet.setObject(getCompleteDataOfNode(semGraph, child));
+            	 if(isPassive)
+            		 cUnit.addSubject(getSubjectDataOfNode(semGraph, child));
+            	 else cUnit.addObject(getCompleteDataOfNode(semGraph, child,cUnit));
+             }
+             
+             //Logic for additional data like prepositions.
+             else if(rel.startsWith("prep"))
+             {
+            	 int index=rel.lastIndexOf('_')+1;
+            	 if(index!=0)
+            	 {
+            		 Doublet d=new Doublet(rel.substring(index),child.word());
+            		 cUnit.addAdditionalData(d);
+            	 }
              }
 		}
 		//result.setTriplet(triplet);
-		Logger.log(result.toString());
+		Logger.log(cUnit.toString());
 		return result;
 	}
 	public static void parse(String text)
@@ -134,7 +185,7 @@ public class ParserHelper
 		for(CoreMap sentence:sentences)
 		{
 			SemanticGraph dep=sentence.get(CollapsedCCProcessedDependenciesAnnotation.class);
-			//doShit(dep);
+			//doProcessing(dep);
 			processSentence(dep);
 			//System.out.println("Sentence: "+sentence.toString());
 		    //System.out.println("DEPENDENCIES: "+dep.toList());

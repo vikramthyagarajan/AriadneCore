@@ -9,6 +9,11 @@ public class SimpleUnit
 	public SimpleUnit()
 	{
 		additionalInfo=new ArrayList<Doublet>();
+		triplet=new Triplet();
+	}
+	public String toString()
+	{
+		return "Triplet: "+triplet.toString();
 	}
 	public Triplet getTriplet()
 	{
