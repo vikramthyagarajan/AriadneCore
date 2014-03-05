@@ -13,6 +13,13 @@ public class ComplexUnit
 		objects=new ArrayList<String>();
 		additionalData=new ArrayList<Doublet>();
 	}
+	public ComplexUnit(ComplexUnit compUnit)
+	{
+		subjects=new ArrayList<String>(compUnit.getSubjects());
+		verbs=new ArrayList<String>(compUnit.getVerbs());
+		objects=new ArrayList<String>(compUnit.getObjects());
+		additionalData=new ArrayList<Doublet>(compUnit.getAdditionalData());
+	}
 	public void addSubject(String subj)
 	{
 		subjects.add(subj);
@@ -44,6 +51,22 @@ public class ComplexUnit
 	public int getAdditionalDataCount()
 	{
 		return additionalData.size();
+	}
+	public ArrayList<String>getSubjects()
+	{
+		return this.subjects;
+	}
+	public ArrayList<String>getVerbs()
+	{
+		return this.verbs;
+	}
+	public ArrayList<String>getObjects()
+	{
+		return this.objects;
+	}
+	public ArrayList<Doublet>getAdditionalData()
+	{
+		return this.additionalData;
 	}
 	public String toString()
 	{
