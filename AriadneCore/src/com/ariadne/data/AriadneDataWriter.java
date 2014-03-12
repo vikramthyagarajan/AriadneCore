@@ -1,0 +1,92 @@
+package com.ariadne.data;
+
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.util.ArrayList;
+
+import org.apache.jena.riot.RDFDataMgr;
+import org.apache.jena.riot.RDFFormat;
+
+import com.ariadne.units.AriadneStatement;
+import com.ariadne.units.ComplexUnit;
+import com.ariadne.units.Doublet;
+import com.ariadne.units.SentenceUnit;
+import com.ariadne.util.Logger;
+import com.hp.hpl.jena.query.Dataset;
+import com.hp.hpl.jena.rdf.model.Model;
+import com.hp.hpl.jena.rdf.model.Property;
+import com.hp.hpl.jena.rdf.model.Resource;
+
+public class AriadneDataWriter 
+{
+	private Dataset mDataset;
+	private Model mModel;
+	private ArrayList<SentenceUnit>sentencesToWrite;
+	private FileOutputStream fileOutputStream;
+	public AriadneDataWriter(Dataset dataset,Model model) throws IOException
+	{
+		this.mDataset=dataset;
+		this.mModel=model;
+		this.sentencesToWrite=new ArrayList<SentenceUnit>();
+		File f=new File(DataConfiguration.getDataPath()+DataConfiguration.FILENAME);
+		if(!f.exists())
+			f.createNewFile();
+		this.fileOutputStream=new FileOutputStream(f);
+	}
+	public void addSentenceToBeWritten(SentenceUnit sentence)
+	{
+		sentencesToWrite.add(sentence);
+	}
+	public void write()
+	{
+		// Create the resource
+		
+		Property preposition;
+		Resource anonObject,anonSubject,subject;
+		Doublet prepData;
+		int subjectCount,objectCount,prepCount;
+		for(SentenceUnit senUnit:sentencesToWrite)
+		{
+			ArrayList<ComplexUnit> comUnits=senUnit.getComplexUnits();
+			for(ComplexUnit comUnit:comUnits)
+			{
+				subjectCount=comUnit.getSubjectCount();
+				objectCount=comUnit.getObjectCount();
+				prepCount=comUnit.getAdditionalDataCount();
+				for(int k=0;k<subjectCount;k++)
+				{
+					subject=mModel.createResource(comUnit.getSubjectAt(k));
+					anonObject=mModel.createResource();
+                	for(int i=0;i<objectCount;i++)
+                	{
+                		anonObject.addProperty(AriadneStatement.object,comUnit.getObjectAt(i));
+                		for(int j=0;j<prepCount;j++)
+                		{
+                			prepData=comUnit.getAdditionalDataAt(j);
+                			preposition=mModel.createProperty(prepData.getPreposition());
+                			anonObject.addProperty(preposition,prepData.getObject());
+                		}
+                	}
+                	//adding all other important data into subject node.
+                	anonSubject=mModel.createResource();
+                	anonSubject.addProperty(AriadneStatement.documentReference,
+                			senUnit.getDocumentReference().toString());
+                	anonSubject.addProperty(AriadneStatement.sentence,senUnit.getSentence());
+                	anonSubject.addProperty(AriadneStatement.data,anonObject);
+                	subject.addProperty(mModel.createProperty(comUnit.getVerb()),anonSubject);
+				}
+                
+			}
+		}
+		Logger.log("Writing data...");
+		RDFDataMgr.write(this.fileOutputStream,mModel,RDFFormat.TURTLE_BLOCKS);
+		Logger.log("Data successfully written.");
+	}
+	public void close() throws IOException
+	{
+		if(mModel!=null)
+			mModel.close();
+		fileOutputStream.close();
+	}
+}
