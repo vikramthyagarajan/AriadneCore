@@ -12,10 +12,10 @@ public class AriadneStatement
 	static final String mObject = "object";
 	public static Property sentence= null;
 	static final String mSentence= "sentence";
-	public static Property preposition= null;
-	static final String mPreposition= "preposition";
-	public static Property prepositionalObject= null;
-	static final String mPrepositionalObject= "prepositionalObject";
+	//public static Property preposition= null;
+	//static final String mPreposition= "preposition";
+	public static Property data= null;
+	static final String mData= "data";
 	
 	static
 	{
@@ -24,8 +24,8 @@ public class AriadneStatement
 			documentReference=new PropertyImpl(URI,mDocumentReference);
 			object=new PropertyImpl(URI,mObject);
 			sentence=new PropertyImpl(URI,mSentence);
-			preposition=new PropertyImpl(URI,mPreposition);
-			prepositionalObject=new PropertyImpl(URI,mPrepositionalObject);
+			//preposition=new PropertyImpl(URI,mPreposition);
+			data=new PropertyImpl(URI,mData);
 		}
 		catch(Exception e)
 		{
