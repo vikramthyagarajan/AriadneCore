@@ -31,6 +31,6 @@ public class DocumentReference
 	}
 	public String toString()
 	{
-		return "DocumentID: "+docID+" || Sentence Number: "+sentenceNo;
+		return docID+sentenceNo;
 	}
 }
