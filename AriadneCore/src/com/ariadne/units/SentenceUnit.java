@@ -44,5 +44,15 @@ public class SentenceUnit
 	public ArrayList<ComplexUnit> getComplexUnits()
 	{
 		return this.units;
-	}
+	}/*
+	public boolean equals(Object o)
+	{
+		if(o instanceof SentenceUnit)
+		{
+			SentenceUnit new_name = (SentenceUnit) o;			
+			if(this.docRef.equals(new_name.getDocumentReference()))
+				return true;
+		}
+		return false;
+	}*/
 }
