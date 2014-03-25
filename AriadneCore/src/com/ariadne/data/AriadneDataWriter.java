@@ -14,6 +14,7 @@ import com.ariadne.units.Doublet;
 import com.ariadne.units.SentenceUnit;
 import com.ariadne.util.Logger;
 import com.hp.hpl.jena.query.Dataset;
+import com.hp.hpl.jena.query.ReadWrite;
 import com.hp.hpl.jena.rdf.model.Model;
 import com.hp.hpl.jena.rdf.model.Property;
 import com.hp.hpl.jena.rdf.model.Resource;
@@ -38,8 +39,13 @@ public class AriadneDataWriter
 	{
 		sentencesToWrite.add(sentence);
 	}
+	private void begin()
+	{
+		mDataset.begin(ReadWrite.WRITE);
+	}
 	public void write()
 	{
+		this.begin();
 		// Create the resource
 		
 		Property preposition;
@@ -56,7 +62,7 @@ public class AriadneDataWriter
 				prepCount=comUnit.getAdditionalDataCount();
 				for(int k=0;k<subjectCount;k++)
 				{
-					subject=mModel.createResource(comUnit.getSubjectAt(k));
+					subject=mModel.createResource(AriadneStatement.URI+comUnit.getSubjectAt(k));
 					anonObject=mModel.createResource();
                 	for(int i=0;i<objectCount;i++)
                 	{
@@ -65,7 +71,9 @@ public class AriadneDataWriter
                 		{
                 			prepData=comUnit.getAdditionalDataAt(j);
                 			preposition=mModel.createProperty(prepData.getPreposition());
-                			anonObject.addProperty(preposition,prepData.getObject());
+                			//anonObject.addProperty(AriadneStatement.preposition,prepData.getPreposition());
+                			//anonObject.addProperty(AriadneStatement.prepositionData,prepData.getObject());
+                			anonObject.addProperty(preposition, prepData.getObject());
                 		}
                 	}
                 	//adding all other important data into subject node.
@@ -74,7 +82,8 @@ public class AriadneDataWriter
                 			senUnit.getDocumentReference().toString());
                 	anonSubject.addProperty(AriadneStatement.sentence,senUnit.getSentence());
                 	anonSubject.addProperty(AriadneStatement.data,anonObject);
-                	subject.addProperty(mModel.createProperty(comUnit.getVerb()),anonSubject);
+                	anonSubject.addProperty(AriadneStatement.verb,comUnit.getVerb());
+                	subject.addProperty(AriadneStatement.statementData,anonSubject);
 				}
                 
 			}
