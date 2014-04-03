@@ -47,6 +47,7 @@ public class AriadneDataWriter
 	{
 		this.begin();
 		// Create the resource
+		mModel.setNsPrefix("ar",AriadneStatement.URI);
 		
 		Property preposition;
 		Resource anonObject,anonSubject,subject;
@@ -70,7 +71,7 @@ public class AriadneDataWriter
                 		for(int j=0;j<prepCount;j++)
                 		{
                 			prepData=comUnit.getAdditionalDataAt(j);
-                			preposition=mModel.createProperty(prepData.getPreposition());
+                			preposition=mModel.createProperty(AriadneStatement.URI+prepData.getPreposition());
                 			//anonObject.addProperty(AriadneStatement.preposition,prepData.getPreposition());
                 			//anonObject.addProperty(AriadneStatement.prepositionData,prepData.getObject());
                 			anonObject.addProperty(preposition, prepData.getObject());

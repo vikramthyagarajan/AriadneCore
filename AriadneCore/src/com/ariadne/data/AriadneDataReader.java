@@ -2,9 +2,13 @@ package com.ariadne.data;
 
 import java.util.ArrayList;
 
+import org.apache.jena.riot.RDFDataMgr;
+import org.apache.jena.riot.RDFFormat;
+
 import com.ariadne.units.AriadneStatement;
 import com.ariadne.units.ComplexUnit;
 import com.ariadne.units.DocumentReference;
+import com.ariadne.units.Doublet;
 import com.ariadne.units.SentenceUnit;
 import com.ariadne.util.Logger;
 import com.hp.hpl.jena.query.Dataset;
@@ -46,6 +50,10 @@ public class AriadneDataReader
 			if(((Property)predicate).equals(AriadneStatement.object))
 			{
 				comUnit.addObject(object.toString());
+			}
+			else
+			{
+				comUnit.addAdditionalData(new Doublet(predicate.toString(), object.toString()));
 			}
 		}
 	}
@@ -117,12 +125,16 @@ public class AriadneDataReader
 			QueryExecution qe=QueryExecutionFactory.create(query,mDataSet);
 			try
 			{
-				Model rs=qe.execDescribe();
-				//RDFDataMgr.write(System.out,rs,RDFFormat.TURTLE_BLOCKS);
+				Model rs;
+				if(type==AriadneDataReader.CONSTRUCT_QUERY)
+					rs=qe.execConstruct();
+				else if(type==AriadneDataReader.DESCRIBE_QUERY)
+					rs=qe.execDescribe();
+				else{throw new Exception("Only construct and describe queries allowed.");}
+				RDFDataMgr.write(System.out,rs,RDFFormat.TURTLE_BLOCKS);
 				//ResultSetFormatter.out(rs);
 				//Resource r=mDataSet.getDefaultModel().getResource(subj);
 				//Node n= r.asNode();
-				Logger.log("aaaa ");
 				/*while(rs.hasNext())
 				{
 					QuerySolution qs=rs.next();
@@ -130,14 +142,11 @@ public class AriadneDataReader
 					Logger.log(""+r.toString());
 				}*/
 				sentences=getSentencesFromModel(rs);
-				Logger.log("displaying results:");
-				for(SentenceUnit s:sentences)
-					Logger.log(s.toString());
 				return sentences;
 			}
 			catch(Exception e)
 			{
-				
+				Logger.log("ffgh"+e.getMessage());
 			}
 			finally
 			{
@@ -151,3 +160,5 @@ public class AriadneDataReader
 		return null;
 	}
 }
+
+

@@ -6,7 +6,10 @@ import java.util.Scanner;
 import com.ariadne.data.AriadneDataReader;
 import com.ariadne.data.AriadneDataWriter;
 import com.ariadne.data.DataConfiguration;
+import com.ariadne.units.AnswerUnit;
+import com.ariadne.units.AriadneStatement;
 import com.ariadne.units.SentenceUnit;
+import com.ariadne.units.SimpleQuestionUnit;
 import com.ariadne.util.Logger;
 
 public class Test 
@@ -22,9 +25,11 @@ public class Test
 			
 			adw = new AriadneDataWriter(DataConfiguration.getDataset(),
 					DataConfiguration.getModel());
-			sentences=ParserHelper.parse(sc.nextLine());
+			TextParserHelper ph=new TextParserHelper();
+			sentences=ph.parse(sc.nextLine());
 			for(SentenceUnit senUnit:sentences)
-				adw.addSentenceToBeWritten(senUnit);
+				//Logger.log(senUnit.toString());
+                adw.addSentenceToBeWritten(senUnit);
 			//ParserHelper.parse("Sam likes Abby.");
 			//ParserHelper.parse("The first working steam-powered vehicle was designed - and most " +
 				//"likely built - by Ferdinand Verbiest, a Flemish member of a Jesuit mission in " +
@@ -37,14 +42,26 @@ public class Test
 			adw.write();
 			adw.close();
 			DataConfiguration.closeDataset();
-		/*
+			/*
         	AriadneDataReader adr=new AriadneDataReader(DataConfiguration.getDataset(),
         			DataConfiguration.getModel());
-        	adr.queryModel("describe ?s where {?s <http://amazing.com/statementData> ?o." +
-        			"?o <http://amazing.com/data> ?d." +
-        			"?o <http://amazing.com/verb> ?v." +
-        			"?d <http://amazing.com/object> \"Abby\"}",0);
-        	Logger.log("<>");
+        	SimpleQuestionUnit squ=new SimpleQuestionUnit(AnswerUnit.LIST);
+        	squ.setSubject("Sam");
+        	//squ.setVerb("loved");
+        	//squ.setObject("Jim");
+        	squ.setPrep("with");
+        	//sentences=adr.queryModel(squ.generateQuery(),AriadneDataReader.CONSTRUCT_QUERY);
+        	
+        	sentences=adr.queryModel("construct where {<http://ariadne.com/Sam> <http://ariadne.com/statementData> ?o." +
+        			"?o <http://ariadne.com/data> ?d." +
+        			"?o <http://ariadne.com/docRef> ?r." +
+        			"?o <http://ariadne.com/verb> ?v." +
+        			"?d <http://ariadne.com/object> ?h." +
+        			"?d <with> ?pd}",AriadneDataReader.CONSTRUCT_QUERY);
+        			
+        	Logger.log("displaying results:");
+			for(SentenceUnit s:sentences)
+				Logger.log(s.toString());
         */
         }
 		catch (Exception e) 
