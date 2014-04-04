@@ -97,6 +97,7 @@ public class AriadneDataWriter
 	{
 		if(mModel!=null)
 			mModel.close();
+		DataConfiguration.closeDataset();
 		fileOutputStream.close();
 	}
 }
