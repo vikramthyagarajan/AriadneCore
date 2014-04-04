@@ -131,7 +131,6 @@ public class AriadneDataReader
 				else if(type==AriadneDataReader.DESCRIBE_QUERY)
 					rs=qe.execDescribe();
 				else{throw new Exception("Only construct and describe queries allowed.");}
-				RDFDataMgr.write(System.out,rs,RDFFormat.TURTLE_BLOCKS);
 				//ResultSetFormatter.out(rs);
 				//Resource r=mDataSet.getDefaultModel().getResource(subj);
 				//Node n= r.asNode();
@@ -155,7 +154,8 @@ public class AriadneDataReader
 		}
 		finally
 		{
-			mDataSet.end();
+			mModel.close();
+			DataConfiguration.closeDataset();
 		}
 		return null;
 	}
