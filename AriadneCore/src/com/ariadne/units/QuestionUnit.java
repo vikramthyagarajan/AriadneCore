@@ -17,5 +17,9 @@ public abstract class QuestionUnit
 		return this.type;
 	}
 	public abstract String generateQuery();
+	public String toString()
+	{
+		return "Type: "+this.type+" ";
+	}
 
 }

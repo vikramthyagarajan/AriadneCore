@@ -23,12 +23,14 @@ public class AriadneDataWriter
 {
 	private Dataset mDataset;
 	private Model mModel;
+	private DataConfiguration mDataConfiguration;
 	private ArrayList<SentenceUnit>sentencesToWrite;
 	private FileOutputStream fileOutputStream;
-	public AriadneDataWriter(Dataset dataset,Model model) throws IOException
+	public AriadneDataWriter(DataConfiguration mDataConfiguration) throws IOException
 	{
-		this.mDataset=dataset;
-		this.mModel=model;
+		this.mDataConfiguration=mDataConfiguration;
+		this.mDataset=mDataConfiguration.getDataset();
+		this.mModel=mDataConfiguration.getModel();
 		this.sentencesToWrite=new ArrayList<SentenceUnit>();
 		File f=new File(DataConfiguration.getDataPath()+DataConfiguration.FILENAME);
 		if(!f.exists())
@@ -97,7 +99,7 @@ public class AriadneDataWriter
 	{
 		if(mModel!=null)
 			mModel.close();
-		DataConfiguration.closeDataset();
+		mDataConfiguration.closeDataset();
 		fileOutputStream.close();
 	}
 }

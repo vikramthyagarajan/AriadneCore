@@ -9,7 +9,7 @@ public class DataConfiguration
 {
 	private static String dataPath="/home/vikram/ontologies/dump/";
 	public static final String FILENAME="data.rdf";
-	private static Dataset mDataSet;
+	private  Dataset mDataSet;
 	public static void setDataPath(String path)
 	{
 		dataPath=path;
@@ -18,23 +18,23 @@ public class DataConfiguration
 	{
 		return dataPath;
 	}
-	public static Model getModel()
+	public Model getModel()
 	{
 		mDataSet=getDataset();
 		return mDataSet.getDefaultModel();
 	}
-	public static Model getModel(String model)
+	public Model getModel(String model)
 	{
 		mDataSet=getDataset();
 		return mDataSet.getNamedModel(model);
 	}
-	public static Dataset getDataset()
+	public Dataset getDataset()
 	{
 		if(mDataSet==null)
 			return TDBFactory.createDataset(dataPath);
 		else return mDataSet;
 	}
-	public static void closeDataset()
+	public void closeDataset()
 	{
 		if(mDataSet!=null)
 			mDataSet.close();

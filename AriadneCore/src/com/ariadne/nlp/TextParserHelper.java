@@ -82,8 +82,6 @@ public class TextParserHelper
 	 */
 	private String getCompleteDataOfNode(SemanticGraph semGraph,IndexedWord node,ComplexUnit cUnit)
 	{
-		Logger.log(node.word()+" check "+mCorefHandler.isMention(node));
-		Logger.log(node.word()+" r check "+mCorefHandler.isRepresentativeMention(node));
 		if(mCorefHandler.isMention(node))
 			return mCorefHandler.getRepresentativeMentionOf(node);
 		StringBuilder result=new StringBuilder();
@@ -91,25 +89,25 @@ public class TextParserHelper
 		for(IndexedWord child:children)
 		{
 			String rel=semGraph.getEdge(node, child).getRelation().toString();
-			if(rel.equals("amod"))
+			/*if(rel.equals("amod"))
 			{
-				result.append(child.word()+" ");
+				result.append(child.lemma()+" ");
 			}
-			else if(rel.equals("nn"))
+			else */if(rel.equals("nn"))
 			{
-				result.append(child.word()+" ");
+				result.append(child.lemma()+" ");
 			}
 			else if(rel.startsWith("prep"))
 			{
 				int index=rel.lastIndexOf('_')+1;
 				if(index!=0)
 				{
-					Doublet d=new Doublet(rel.substring(index),child.word());
+					Doublet d=new Doublet(rel.substring(index),child.lemma());
 					cUnit.addAdditionalData(d);
            	 	}
 			}
 		}
-		result.append(node.word());
+		result.append(node.lemma());
 		if(mCorefHandler.isRepresentativeMention(node))
 			mCorefHandler.setStringMention(node, result.toString());
 		return result.toString();
@@ -122,8 +120,8 @@ public class TextParserHelper
 	 */
 	private String getSubjectDataOfNode(SemanticGraph semGraph,IndexedWord node)
 	{
-		Logger.log(node.word()+" check "+mCorefHandler.isMention(node));
-		Logger.log(node.word()+" r check "+mCorefHandler.isRepresentativeMention(node));
+		Logger.log(node.lemma()+" check "+mCorefHandler.isMention(node));
+		Logger.log(node.lemma()+" r check "+mCorefHandler.isRepresentativeMention(node));
 		if(mCorefHandler.isMention(node))
 			return mCorefHandler.getRepresentativeMentionOf(node);
 		StringBuilder result=new StringBuilder();
@@ -133,15 +131,15 @@ public class TextParserHelper
 			String rel=semGraph.getEdge(node, child).getRelation().getShortName();
 			if(rel.equals("nn"))
 			{
-				result.append(child.word()+" ");
+				result.append(child.lemma()+" ");
 			}
-			else if(rel.startsWith("prep"))
+			else if(rel.startsWith("prep_of"))
 			{
-				result.append(child.word()+":");
+				result.append(child.lemma()+":");
 			}
 			
 		}
-		result.append(node.word());
+		result.append(node.lemma());
 		if(mCorefHandler.isRepresentativeMention(node))
 			mCorefHandler.setStringMention(node, result.toString());
 		return result.toString();
@@ -153,7 +151,7 @@ public class TextParserHelper
 	{
 		ComplexUnit cu=new ComplexUnit();
 		List<IndexedWord>children=semGraph.getChildList(w);
-		cu.setVerb(w.word());
+		cu.setVerb(w.lemma());
 		boolean prevValueOfPassive=isPassive;
 		isPassive=false;
 		for(IndexedWord child:children)
@@ -173,7 +171,7 @@ public class TextParserHelper
 			IndexedWord currentWord,SentenceUnit senUnit,ComplexUnit cUnit)
 	{
 		List<IndexedWord>children=semGraph.getChildList(currentWord);
-		cUnit.setVerb(currentWord.word());
+		cUnit.setVerb(currentWord.lemma());
 		boolean prevValueOfPassive=isPassive;
 		isPassive=false;
 		for(IndexedWord child:children)
@@ -192,7 +190,7 @@ public class TextParserHelper
          if(rel.startsWith("conj"))
          {
         	 //if(rel.startsWith("conj_and"))
-               //  cUnit.addVerb(child.word());
+               //  cUnit.addVerb(child.lemma());
         	 //else if(rel.startsWith("conj_but"))
     		 addSentence(senUnit,child,semGraph);
         	 /*
@@ -239,7 +237,7 @@ public class TextParserHelper
         	 int index=rel.lastIndexOf('_')+1;
         	 if(index!=0)
         	 {
-        		 Doublet d=new Doublet(rel.substring(index),child.word());
+        		 Doublet d=new Doublet(rel.substring(index),child.lemma());
         		 cUnit.addAdditionalData(d);
         	 }
          }
@@ -252,8 +250,9 @@ public class TextParserHelper
 	{
 		SentenceUnit result=new SentenceUnit();
 		result.setSentence(sentence);
-		result.setDocumentReference(dr);
 		IndexedWord root=semGraph.getFirstRoot();
+		dr.setSentenceNo(root.sentIndex());
+		result.setDocumentReference(dr);
 		
 			
 		//checking if the root node is a verb. If not, it is a description type sentence.
@@ -271,7 +270,7 @@ public class TextParserHelper
 		
 		List<IndexedWord>children=semGraph.getChildList(root);
 		ComplexUnit cUnit=new ComplexUnit();
-		cUnit.setVerb(root.word());
+		cUnit.setVerb(root.lemma());
 		isPassive=false;
 		for(IndexedWord child:children)
 		{
@@ -282,7 +281,7 @@ public class TextParserHelper
 		result.addComplexUnit(cUnit);
 		return result;
 	}
-	public ArrayList<SentenceUnit> parse(String text)
+	public ArrayList<SentenceUnit> parse(String text, String documentId)
 	{
 		ArrayList<SentenceUnit> result=new ArrayList<SentenceUnit>();
 		Properties props=new Properties();
@@ -291,14 +290,13 @@ public class TextParserHelper
 		Annotation document=new Annotation(text);
 		pipeline.annotate(document);
 		List<CoreMap>sentences=document.get(SentencesAnnotation.class);
-		String value="";
 		Map<Integer, CorefChain> corefGraph = document.get(
 				CorefCoreAnnotations.CorefChainAnnotation.class);
 		mCorefHandler=new CorefHandler("documentReferenceShit");
 		mCorefHandler.init(corefGraph);
         for(CoreMap sentence:sentences)
 		{
-    		DocumentReference dr=new DocumentReference("jslc142",0);
+    		DocumentReference dr=new DocumentReference(documentId);
 			SemanticGraph dep=sentence.get(CollapsedCCProcessedDependenciesAnnotation.class);
 			//Map<Integer,CorefChain>coRefMap=
                 //Logger.log(sentence.get(CorefCoreAnnotations.CorefAnnotation.class));

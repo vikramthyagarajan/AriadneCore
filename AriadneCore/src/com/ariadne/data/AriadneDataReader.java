@@ -2,9 +2,6 @@ package com.ariadne.data;
 
 import java.util.ArrayList;
 
-import org.apache.jena.riot.RDFDataMgr;
-import org.apache.jena.riot.RDFFormat;
-
 import com.ariadne.units.AriadneStatement;
 import com.ariadne.units.ComplexUnit;
 import com.ariadne.units.DocumentReference;
@@ -27,13 +24,15 @@ public class AriadneDataReader
 {
 	Model mModel;
 	Dataset mDataSet;
+	private DataConfiguration mDataConfiguration;
 	public static final int SELECT_QUERY=0;
 	public static final int DESCRIBE_QUERY=1;
 	public static final int CONSTRUCT_QUERY=2;
-	public AriadneDataReader(Dataset dataset,Model model)
+	public AriadneDataReader(DataConfiguration df)
 	{
-		this.mDataSet=dataset;
-		this.mModel=model;
+		this.mDataConfiguration=df;
+		this.mDataSet=df.getDataset();
+		this.mModel=df.getModel();
 	}
 	private void begin()
 	{
@@ -49,7 +48,7 @@ public class AriadneDataReader
 			RDFNode object=node.getObject();
 			if(((Property)predicate).equals(AriadneStatement.object))
 			{
-				comUnit.addObject(object.toString());
+				comUnit.addObject(object.toString().replace('_',' '));
 			}
 			else
 			{
@@ -69,7 +68,7 @@ public class AriadneDataReader
 			{
 				if(predicate.equals(AriadneStatement.verb))
 				{
-					comUnit.setVerb(object.toString());
+					comUnit.setVerb(object.toString().replace('_',' '));
 				}
                 else if(predicate.equals(AriadneStatement.sentence))
                 {
@@ -99,7 +98,8 @@ public class AriadneDataReader
         {
         	SentenceUnit senUnit=new SentenceUnit();
         	ComplexUnit comUnit=new ComplexUnit();
-        	comUnit.addSubject(subject.toString());
+        	Logger.log("asss "+subject.getLocalName());
+        	comUnit.addSubject(subject.getLocalName().replace('_',' '));
         	putStatementDataIntoSentenceUnit(senUnit,comUnit,(Resource) statementData.next().getObject());
         	sentences.add(senUnit);
         }
@@ -122,6 +122,7 @@ public class AriadneDataReader
 		ArrayList<SentenceUnit>sentences;
 		try
 		{
+			//begin();
 			QueryExecution qe=QueryExecutionFactory.create(query,mDataSet);
 			try
 			{
@@ -155,7 +156,7 @@ public class AriadneDataReader
 		finally
 		{
 			mModel.close();
-			DataConfiguration.closeDataset();
+			mDataConfiguration.closeDataset();
 		}
 		return null;
 	}

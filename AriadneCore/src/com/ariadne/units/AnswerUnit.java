@@ -8,6 +8,8 @@ public class AnswerUnit
 	public static final int TIME=3;
 	public static final int PERSON=4;
 	public static final int LOCATION=5;
+	public static final int DESCRIBE=6;
+	public static final int EXPLAIN=7;
 	
 	private int type;
 	private String queryString;

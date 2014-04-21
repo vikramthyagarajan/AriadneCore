@@ -18,21 +18,27 @@ public class SimpleQuestionUnit extends QuestionUnit
 		result.append("construct where {");
 		if(subject==null)
 			result.append("?s <"+AriadneStatement.statementData.toString()+"> ?o.");
-		else result.append("<"+namespace+subject+"> <"+AriadneStatement.statementData.toString()+"> ?o.");
+		else result.append("<"+namespace+subject.replace(' ','_')+"> <"+AriadneStatement.statementData.toString()+"> ?o.");
 		result.append("?o <http://ariadne.com/data> ?d." +
-				"?o <http://ariadne.com/docRef> ?r.");
+				"?o <http://ariadne.com/docRef> ?r." +
+				"?o <http://ariadne.com/sentence> ?sen.");
 		if(verb==null)
 			result.append("?o <http://ariadne.com/verb> ?v.");
-		else result.append("?o <http://ariadne.com/verb> \""+verb+"\".");
+		else result.append("?o <http://ariadne.com/verb> \""+verb.replace(' ','_')+"\".");
+		if(object==null&&prep==null&&prepData==null)
+		{
+			result.append("}");
+			return result.toString();
+		}
 		if(object==null)
 			result.append("?d <http://ariadne.com/object> ?h.");
-		else result.append("?d <http://ariadne.com/object> \""+object+"\".");
+		else result.append("?d <http://ariadne.com/object> \""+object.replace(' ','_')+"\".");
 		if(prep==null)
 			result.append("?d ?p");
-		else result.append("?d <"+prep+"> ");
+		else result.append("?d <"+namespace+prep+"> ");
 		if(prepData==null)
 			result.append("?pd.");
-		else result.append("\""+prepData+"\"");
+		else result.append("\""+prepData+"\".");
 		result.append("}");
 		return result.toString();
 	}
@@ -65,6 +71,10 @@ public class SimpleQuestionUnit extends QuestionUnit
 	}
 	public void setPrepData(String prepData) {
 		this.prepData = prepData;
+	}
+	public String toString()
+	{
+		return super.toString()+"\n "+subject+": "+verb+": "+object+": "+prep;
 	}
 
 }

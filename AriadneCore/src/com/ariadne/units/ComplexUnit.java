@@ -53,11 +53,11 @@ public class ComplexUnit
 	}
 	public String getSubjectAt(int i)
 	{
-		return subjects.get(i);
+		return subjects.get(i).replace(' ','_');
 	}
 	public String getVerb()
 	{
-		return this.verb;
+		return this.verb.replace(' ','_');
 	}
 	public ArrayList<String>getObjects()
 	{
@@ -65,7 +65,7 @@ public class ComplexUnit
 	}
 	public String getObjectAt(int i)
 	{
-		return objects.get(i);
+		return objects.get(i).replace(' ','_');
 	}
 	public ArrayList<Doublet>getAdditionalData()
 	{

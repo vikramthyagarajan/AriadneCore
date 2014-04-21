@@ -18,7 +18,7 @@ public class SentenceUnit
 		for(int i=0;i<units.size();i++)
 			str.append(units.get(i).toString());
 		
-		return "\nDocument Reference: "+docRef.toString()+
+		return "\nDocument Reference: "+docRef.toString()+"\nSentence: "+sentence+
 				"\nData: \n"+str;
 	}
 	public void addComplexUnit(ComplexUnit data)
@@ -55,4 +55,40 @@ public class SentenceUnit
 		}
 		return false;
 	}*/
+	@Override
+	public int hashCode() {
+		final int prime = 31;
+		int result = 1;
+		result = prime * result + ((docRef == null) ? 0 : docRef.hashCode());
+		result = prime * result
+				+ ((sentence == null) ? 0 : sentence.hashCode());
+		result = prime * result + ((units == null) ? 0 : units.hashCode());
+		return result;
+	}
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj)
+			return true;
+		if (obj == null)
+			return false;
+		if (getClass() != obj.getClass())
+			return false;
+		SentenceUnit other = (SentenceUnit) obj;
+		if (docRef == null) {
+			if (other.docRef != null)
+				return false;
+		} else if (!docRef.equals(other.docRef))
+			return false;
+		if (sentence == null) {
+			if (other.sentence != null)
+				return false;
+		} else if (!sentence.equals(other.sentence))
+			return false;
+		if (units == null) {
+			if (other.units != null)
+				return false;
+		} else if (!units.equals(other.units))
+			return false;
+		return true;
+	}
 }

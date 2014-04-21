@@ -44,7 +44,7 @@ public class DocumentReference
 	public String toString()
 	{
 		return docID+sentenceNo;
-	}
+	}/*
 	public boolean equals(Object o)
 	{
 		if(o instanceof DocumentReference)
@@ -54,5 +54,31 @@ public class DocumentReference
 				return true;
 		}
 		return false;
+	}*/
+	@Override
+	public int hashCode() {
+		final int prime = 31;
+		int result = 1;
+		result = prime * result + ((docID == null) ? 0 : docID.hashCode());
+		result = prime * result + sentenceNo;
+		return result;
+	}
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj)
+			return true;
+		if (obj == null)
+			return false;
+		if (getClass() != obj.getClass())
+			return false;
+		DocumentReference other = (DocumentReference) obj;
+		if (docID == null) {
+			if (other.docID != null)
+				return false;
+		} else if (!docID.equals(other.docID))
+			return false;
+		if (sentenceNo != other.sentenceNo)
+			return false;
+		return true;
 	}
 }
