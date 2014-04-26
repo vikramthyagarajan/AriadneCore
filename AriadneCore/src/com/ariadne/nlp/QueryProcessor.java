@@ -14,6 +14,11 @@ public class QueryProcessor
 		mAnswerProcessor=new AnswerProcessor();
 		mQueryParserHelper= new QueryParserHelper();
 	}
+	/*
+	 * Prepares an answer unit depending on the type of question that is asked. The answer processor
+	 * understands answer units and does all the required processing based on the pipeline that
+	 * is specified in the answer unit. This is where all that info is set.
+	 */
 	private AnswerUnit convertQuestionToAnswerUnit(QuestionUnit qu)
 	{
 		AnswerUnit result=new AnswerUnit(qu.getType());
@@ -45,7 +50,6 @@ public class QueryProcessor
 		try 
 		{
 			QuestionUnit question=mQueryParserHelper.parseQuery(query);
-			Logger.log("ssss "+question.toString());
 			return mAnswerProcessor.processUnit(convertQuestionToAnswerUnit(question));
 		} 
 		catch (Exception e) 

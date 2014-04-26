@@ -56,6 +56,10 @@ public class AriadneDataReader
 			}
 		}
 	}
+	/*
+	 * A method to iterate within a resource and put in all the data within that resource, 
+	 * into the SentenceUnit.
+	 */
 	private void putStatementDataIntoSentenceUnit(SentenceUnit senUnit,ComplexUnit comUnit,Resource anonSubject)
 	{
 		StmtIterator stit=anonSubject.listProperties();
@@ -78,18 +82,17 @@ public class AriadneDataReader
                 {
                 	senUnit.setDocumentReference(new DocumentReference(object.toString()));
                 }
-				Logger.log("literal "+node.toString());
 			}
 			else 
 			{
 				putObjectData(comUnit,(Resource)object);
-				Logger.log("resource "+node.toString());
 			}
-			//Logger.log(stit.next().toString());
 		}
 		senUnit.addComplexUnit(comUnit);
-		Logger.log("oooooooo");
 	}
+	/*
+	 * Method to get all the SentenceUnits within a model resource.
+	 */
 	private ArrayList<SentenceUnit> getSentenceUnitsFromResource(Resource subject)
 	{
 		ArrayList<SentenceUnit>sentences=new ArrayList<SentenceUnit>();
@@ -98,7 +101,6 @@ public class AriadneDataReader
         {
         	SentenceUnit senUnit=new SentenceUnit();
         	ComplexUnit comUnit=new ComplexUnit();
-        	Logger.log("asss "+subject.getLocalName());
         	comUnit.addSubject(subject.getLocalName().replace('_',' '));
         	putStatementDataIntoSentenceUnit(senUnit,comUnit,(Resource) statementData.next().getObject());
         	sentences.add(senUnit);
@@ -108,8 +110,6 @@ public class AriadneDataReader
 	private ArrayList<SentenceUnit> getSentencesFromModel(Model mModel)
 	{
 		ArrayList<SentenceUnit>sentences=new ArrayList<SentenceUnit>();
-		//Resource r=mModel.getResource("Sam");
-		//Property p=mModel.getProperty("http://amazing.com/verb");
 		ResIterator rsi=mModel.listResourcesWithProperty(AriadneStatement.statementData);
 		while(rsi.hasNext())		//iterating through every subject.
 		{
@@ -117,12 +117,15 @@ public class AriadneDataReader
 		}
 		return sentences;
 	}
+	/*
+	 * Queries given a query and the type of query to be executed on TripleDB 
+	 * and retrieves all the sentences in the form of SentenceUnits.
+	 */
 	public ArrayList<SentenceUnit> queryModel(String query,int type)
 	{
 		ArrayList<SentenceUnit>sentences;
 		try
 		{
-			//begin();
 			QueryExecution qe=QueryExecutionFactory.create(query,mDataSet);
 			try
 			{
@@ -132,21 +135,12 @@ public class AriadneDataReader
 				else if(type==AriadneDataReader.DESCRIBE_QUERY)
 					rs=qe.execDescribe();
 				else{throw new Exception("Only construct and describe queries allowed.");}
-				//ResultSetFormatter.out(rs);
-				//Resource r=mDataSet.getDefaultModel().getResource(subj);
-				//Node n= r.asNode();
-				/*while(rs.hasNext())
-				{
-					QuerySolution qs=rs.next();
-					RDFNode r=qs.get("p");
-					Logger.log(""+r.toString());
-				}*/
 				sentences=getSentencesFromModel(rs);
 				return sentences;
 			}
 			catch(Exception e)
 			{
-				Logger.log("ffgh"+e.getMessage());
+				Logger.log("Error: "+e.getMessage());
 			}
 			finally
 			{

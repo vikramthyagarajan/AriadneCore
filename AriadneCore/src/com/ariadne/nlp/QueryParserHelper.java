@@ -39,6 +39,10 @@ public class QueryParserHelper
 		result.append(node.lemma());
 		return result.toString();
 	}
+	/*
+	 * Used to process a question through its SemanticGraph and retrieve a QuestionUnit 
+	 * containing the structured data in the question.
+	 */
 	public QuestionUnit getQuestionUnitFromGraph(SemanticGraph semGraph) throws Exception
 	{
 		SimpleQuestionUnit result=new SimpleQuestionUnit(0);
@@ -119,6 +123,10 @@ public class QueryParserHelper
 		else throw new Exception("Query not understood or not supported.");
 		return result;
 	}
+	/*
+	 * Takes a string query as an input and obtains a question unit as an output. The question unit
+	 * is a simplified form of what is actually asked by the question.
+	 */
 	public QuestionUnit parseQuery(String query) throws Exception
 	{
 		Properties props=new Properties();

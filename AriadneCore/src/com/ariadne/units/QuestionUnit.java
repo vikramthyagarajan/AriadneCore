@@ -2,6 +2,10 @@ package com.ariadne.units;
 
 public abstract class QuestionUnit 
 {
+	/*
+	 * Abstract class that specifies the functionality that every QuestionUnit must possess
+	 * namely, generating query from itself, and describing the type of question.
+	 */
 	private int type;
 	
 	public QuestionUnit(int type)

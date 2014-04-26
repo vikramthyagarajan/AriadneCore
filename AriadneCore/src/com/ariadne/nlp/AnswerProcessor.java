@@ -14,10 +14,15 @@ import com.ariadne.util.Logger;
 public class AnswerProcessor 
 {
 	private AriadneDataReader adr;
+	private DataConfiguration mDataConfiguration;
 	public AnswerProcessor()
 	{
-		adr=new AriadneDataReader(new DataConfiguration());
+		mDataConfiguration=new DataConfiguration();
+		adr=new AriadneDataReader(mDataConfiguration);
 	}
+	/*
+	 * Method that reads the rdf data and retrieves the required data as SentencUnits.
+	 */
 	private ArrayList<SentenceUnit> getSentences(String query)
 	{
 		return adr.queryModel(query, AriadneDataReader.CONSTRUCT_QUERY);
@@ -54,10 +59,13 @@ public class AnswerProcessor
 			else return null;
 		}
 	}
+	/*
+	 * This method processes the AnswerUnit and, depending on the pipeline, makes it go through 
+	 * different types of processing  in order to get the required answer in string form.
+	 */
 	public String processUnit(AnswerUnit answerUnit)
 	{
 		ArrayList<SentenceUnit> sentences=getSentences(answerUnit.getQueryString());
-		Logger.log("sgsgs "+answerUnit.getPipelineData()+"   "+sentences.get(0).toString()+"sss "+answerUnit.getPipeline());
 		if(answerUnit.getPipeline().equals("summarize"))
 		{
 			return summarize(sentences);

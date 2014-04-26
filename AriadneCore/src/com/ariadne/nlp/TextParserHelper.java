@@ -145,7 +145,8 @@ public class TextParserHelper
 		return result.toString();
 	}
 	/*
-	 * 
+	 * A sentence in this case is another complex unit which must be added to the sentence unit
+	 * This function does the needful in creating and extracting the complex unit.
 	 */
 	public void addSentence(SentenceUnit senUnit,IndexedWord w,SemanticGraph semGraph)
 	{
@@ -181,7 +182,8 @@ public class TextParserHelper
 		isPassive=prevValueOfPassive;
 	}
 	/*
-	 * 
+	 * A recursive function that each node goes through that is used to parse the semantic graph
+	 * and retrieve the important parts of it.
 	 */
 	public void processChildNode(SemanticGraph semGraph,IndexedWord currentRoot,
 			IndexedWord child,SentenceUnit senUnit,ComplexUnit cUnit)
@@ -281,6 +283,10 @@ public class TextParserHelper
 		result.addComplexUnit(cUnit);
 		return result;
 	}
+	/*
+	 * Retrieves an arraylist of sentence units which can be given to the data manager to be stored
+	 * in rdf format.
+	 */
 	public ArrayList<SentenceUnit> parse(String text, String documentId)
 	{
 		ArrayList<SentenceUnit> result=new ArrayList<SentenceUnit>();
@@ -292,23 +298,14 @@ public class TextParserHelper
 		List<CoreMap>sentences=document.get(SentencesAnnotation.class);
 		Map<Integer, CorefChain> corefGraph = document.get(
 				CorefCoreAnnotations.CorefChainAnnotation.class);
-		mCorefHandler=new CorefHandler("documentReferenceShit");
+		mCorefHandler=new CorefHandler(documentId);
 		mCorefHandler.init(corefGraph);
         for(CoreMap sentence:sentences)
 		{
     		DocumentReference dr=new DocumentReference(documentId);
 			SemanticGraph dep=sentence.get(CollapsedCCProcessedDependenciesAnnotation.class);
-			//Map<Integer,CorefChain>coRefMap=
-                //Logger.log(sentence.get(CorefCoreAnnotations.CorefAnnotation.class));
-
+			
 			result.add(processSentence(dep,sentence.toString(),dr));
-			//System.out.println("Sentence: "+sentence.toString());
-		    //System.out.println("DEPENDENCIES: "+dep.toList());
-			//Set<SemanticGraphEdge> li=dep.getEdgeSet();
-		    //Triplet trip=getSubjectVerbObject(li);
-		    //Logger.log(trip.toString());
-		    //System.out.println("DEPENDENCIES SIZE: "+dep.size());
-			//dep.prettyPrint();
 		}
 		return result;
 	}

@@ -45,6 +45,10 @@ public class AriadneDataWriter
 	{
 		mDataset.begin(ReadWrite.WRITE);
 	}
+	/*
+	 * Writing data into the TripleDB as a schema described in AriadneStatement. Every 
+	 * SentenceUnit is stored as one AriadneStatment in rdf.
+	 */
 	public void write()
 	{
 		this.begin();

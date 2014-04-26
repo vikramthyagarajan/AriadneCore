@@ -4,6 +4,11 @@ import com.ariadne.data.DataConfiguration;
 
 public class SimpleQuestionUnit extends QuestionUnit 
 {
+	/*
+	 * An implementation of a QuestionUnit that is simple and only picks sentences that fall within
+	 * the same structure. So only if the subject, object etc matches completely, will it retrieve
+	 * the sentence.
+	 */
 	private String subject,verb,object,prep,prepData;
 
 	public SimpleQuestionUnit(int type)
